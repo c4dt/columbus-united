@@ -8,6 +8,7 @@ module.exports = {
     output: {
         filename: "bundle.min.js",
         path: path.resolve(__dirname, "dist"),
+        publicPath: "/columbus/",
         library: "jsapp",
         libraryTarget: "umd",
         globalObject: "this",
