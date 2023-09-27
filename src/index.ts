@@ -1,19 +1,19 @@
-import {Roster} from '@dedis/cothority/network';
-import {SkipchainRPC} from '@dedis/cothority/skipchain';
-import {SkipBlock} from '@dedis/cothority/skipchain/skipblock';
-import {Block} from './block';
-import {Chain} from './chain';
-import {Flash} from './flash';
-import {Lifecycle} from './lifecycle';
-import {searchBar} from './search';
-import {Status} from './status';
-import './stylesheets/style.scss';
-import {TotalBlock} from './totalBlock';
-import {Utils} from './utils';
-import * as d3 from 'd3';
-import * as introJS from 'intro.js';
-import {select, selectAll} from 'd3';
-import {Config} from './config';
+import { Roster } from "@dedis/cothority/network";
+import { SkipchainRPC } from "@dedis/cothority/skipchain";
+import { SkipBlock } from "@dedis/cothority/skipchain/skipblock";
+import { Block } from "./block";
+import { Chain } from "./chain";
+import { Flash } from "./flash";
+import { Lifecycle } from "./lifecycle";
+import { searchBar } from "./search";
+import { Status } from "./status";
+import "./stylesheets/style.scss";
+import { TotalBlock } from "./totalBlock";
+import { Utils } from "./utils";
+import * as d3 from "d3";
+import * as introJS from "intro.js";
+import { select, selectAll } from "d3";
+import { Config } from "./config";
 
 /*
    ___              _                     _
@@ -40,22 +40,23 @@ _|"""""|_|"""""|_|"""""|_|"""""|_|"""""|_|"""""|_|"""""|_|"""""|
 export function sayHi() {
     initIntro();
 
-    Config.getConfig('assets/config.toml').then((config) => {
+    Config.getConfig("assets/config.toml").then((config) => {
         //Roster selection
         //1. default roster
         startSkipchain(config.roster, config.byzCoinID);
 
         //2. selected roster by user
         document
-            .getElementById('save-roster')
-            .addEventListener('click', function (e) {
+            .getElementById("save-roster")
+            .addEventListener("click", function (e) {
                 const newRosterStr = (
-                    document.getElementById('text-roster') as HTMLTextAreaElement
+                    document.getElementById(
+                        "text-roster"
+                    ) as HTMLTextAreaElement
                 ).value;
                 startSkipchain(Roster.fromTOML(newRosterStr));
             });
-
-    })
+    });
 }
 
 /**
@@ -68,14 +69,14 @@ export function startSkipchain(roster: Roster, genesisBlock?: Buffer) {
     // Create the flash class that will handle the flash messages
     const flash = new Flash();
     if (!roster) {
-        flash.display(Flash.flashType.ERROR, 'Roster is undefined');
+        flash.display(Flash.flashType.ERROR, "Roster is undefined");
         return;
     }
 
-    if (navigator.userAgent.indexOf('Firefox') != -1) {
+    if (navigator.userAgent.indexOf("Firefox") != -1) {
         flash.display(
             Flash.flashType.WARNING,
-            '⚠️⚠️ There is limited compatibility with FIREFOX, especially on a long chain. Use an alternative browser for the best experience.',
+            "⚠️⚠️ There is limited compatibility with FIREFOX, especially on a long chain. Use an alternative browser for the best experience.",
             999999
         );
     }
@@ -107,7 +108,7 @@ export function startSkipchain(roster: Roster, genesisBlock?: Buffer) {
             // skipBlock of the last added block of the chain
 
             // Url input from the user
-            const indexString = window.location.hash.split(':')[1];
+            const indexString = window.location.hash.split(":")[1];
 
             if (indexString != null) {
                 // A block index is inputted
@@ -118,8 +119,8 @@ export function startSkipchain(roster: Roster, genesisBlock?: Buffer) {
 
                     flash.display(
                         Flash.flashType.ERROR,
-                        'index of initial block cannot be negative, specified index is ' +
-                        initialBlockIndex
+                        "index of initial block cannot be negative, specified index is " +
+                            initialBlockIndex
                     );
                 }
 
@@ -127,8 +128,8 @@ export function startSkipchain(roster: Roster, genesisBlock?: Buffer) {
                     // The block index should not be higher than the last added block
                     flash.display(
                         Flash.flashType.ERROR,
-                        'index of initial block cannot be higher than the last added block of the chain, specified index is ' +
-                        initialBlockIndex
+                        "index of initial block cannot be higher than the last added block of the chain, specified index is " +
+                            initialBlockIndex
                     );
                     // Set initial index at last added block of the chain
                     initialBlockIndex = last.index - Chain.numBlocks;
@@ -138,7 +139,7 @@ export function startSkipchain(roster: Roster, genesisBlock?: Buffer) {
 
                 // Size of container that contains the blocks
                 const containerSize = parseInt(
-                    d3.select('#svg-container').style('width')
+                    d3.select("#svg-container").style("width")
                 );
 
                 // Display the correct amount of blocks to fit the end of the chain
@@ -155,25 +156,20 @@ export function startSkipchain(roster: Roster, genesisBlock?: Buffer) {
             }
         })
         .then(() => {
-            scRPC
-                .getSkipBlockByIndex(genesisBlock, 0)
-                .then((genesis) => {
-                    scRPC
-                        .getSkipBlockByIndex(
-                            genesisBlock,
-                            initialBlockIndex
-                        )
-                        .then((initialBlock) => {
-                            // Start the visualization
-                            startColumbus(
-                                genesis.skipblock,
-                                initialBlock.skipblock,
-                                roster,
-                                flash,
-                                genesisBlock !== undefined
-                            );
-                        });
-                });
+            scRPC.getSkipBlockByIndex(genesisBlock, 0).then((genesis) => {
+                scRPC
+                    .getSkipBlockByIndex(genesisBlock, initialBlockIndex)
+                    .then((initialBlock) => {
+                        // Start the visualization
+                        startColumbus(
+                            genesis.skipblock,
+                            initialBlock.skipblock,
+                            roster,
+                            flash,
+                            genesisBlock !== undefined
+                        );
+                    });
+            });
         })
         .catch((e) =>
             flash.display(
@@ -200,12 +196,12 @@ export function startColumbus(
 ) {
     // Reset the svg containers
     if (!defaultSkipchain) {
-        d3.select('#svg-container').selectAll('*').remove();
-        d3.select('.dropdown').remove();
-        d3.select('.block-detail-container').selectAll('*').remove();
-        d3.select('.browse-container').selectAll('*').remove();
-        d3.select('#last-container').selectAll('*').remove();
-        d3.select('#status').selectAll('*').remove();
+        d3.select("#svg-container").selectAll("*").remove();
+        d3.select(".dropdown").remove();
+        d3.select(".block-detail-container").selectAll("*").remove();
+        d3.select(".browse-container").selectAll("*").remove();
+        d3.select("#last-container").selectAll("*").remove();
+        d3.select("#status").selectAll("*").remove();
 
         clearInterval(Status.statusInterval);
     }
@@ -230,7 +226,12 @@ export function startColumbus(
 
     // Create the browsing instance, which is used by the detailBlock class when a
     // user wants to get the lifecycle of an instance.
-    const lifecycle = new Lifecycle(roster, flash, totalBlock, genesisBlock.hash.toString('hex'));
+    const lifecycle = new Lifecycle(
+        roster,
+        flash,
+        totalBlock,
+        genesisBlock.hash.toString("hex")
+    );
 
     //Display status of nodes and statistics of the blockchain
     const skipchainStatus = new Status(roster, initialBlock, flash);
@@ -251,72 +252,72 @@ export function startColumbus(
         roster,
         flash,
         initialBlock,
-        genesisBlock.hash.toString('hex'),
+        genesisBlock.hash.toString("hex"),
         chain.blockClickedSubject,
         block
     );
 }
 
 function initIntro() {
-    document.getElementById('step1').addEventListener('click', function () {
+    document.getElementById("step1").addEventListener("click", function () {
         const intro = introJS.default();
-        intro.setOptions({skipLabel: 'Skip', tooltipPosition: 'left'});
+        intro.setOptions({ skipLabel: "Skip", tooltipPosition: "left" });
 
         intro.setOptions({
             steps: [
                 {
-                    element: document.getElementById('step1'),
-                    intro: 'Welcome to our guided tour through the Columbus Blockchain Explorer! \n You can use the keyboard to naviguate <-> and quit the tour by clicking anywhere on the page. Let\'s start !',
-                    position: 'bottom',
+                    element: document.getElementById("step1"),
+                    intro: "Welcome to our guided tour through the Columbus Blockchain Explorer! \n You can use the keyboard to naviguate <-> and quit the tour by clicking anywhere on the page. Let's start !",
+                    position: "bottom",
                 },
                 {
-                    element: document.getElementById('svg-container'),
+                    element: document.getElementById("svg-container"),
                     intro: 'Here we have a visualization of the <a href="https://github.com/dedis/cothority/tree/master/byzcoin" target="_blank">Byzcoin</a> Blockchain. You can browse through it, by click and dragging. You also can zoom in and out by scrolling up and down.',
-                    position: 'bottom-middle-aligned',
+                    position: "bottom-middle-aligned",
                 },
                 {
-                    element: document.getElementById('svg-container'),
+                    element: document.getElementById("svg-container"),
                     intro: 'Click on a block ! You\'ll be able to check the block details + all the transactions contained in it further down on the page. The arrows remind us that this is not just a simple blockchain, but a <a href="https://github.com/dedis/cothority/tree/master/skipchain" target="_blank">SkipChain</a> ! They allow to traverse short or long distances in a more efficient way. Click on the arrows to move forward, double click to move backwards in the chain.',
-                    position: 'bottom-right-aligned',
+                    position: "bottom-right-aligned",
                 },
                 {
-                    element: document.getElementById('search-input'),
-                    intro: 'The search bar can be used to browse for a particular block using its block id or hash. You can also search for an instance by using its ID, the summary of its evolution is loaded when scrolling down on the page.',
-                    position: 'bottom',
+                    element: document.getElementById("search-input"),
+                    intro: "The search bar can be used to browse for a particular block using its block id or hash. You can also search for an instance by using its ID, the summary of its evolution is loaded when scrolling down on the page.",
+                    position: "bottom",
                 },
                 {
-                    element: document.getElementById('search-mode'),
+                    element: document.getElementById("search-mode"),
                     intro: 'You can select different search modes : <i>"Search by xxx"</i> for a block index/hash or instance specific search, <i>"Automatic search"</i> combines all the methods. ',
                 },
                 {
-                    element: document.getElementById('last-container'),
+                    element: document.getElementById("last-container"),
                     intro: 'This part displays the details of the last added blocks, more items will soon be visible here too. The square blockies <img src ="assets/blockie_example.png"/> represent block hashes, click on it to copy it to your clipboard!',
-                    position: 'left',
+                    position: "left",
                 },
                 {
-                    element: document.querySelector('.block-detail-container'),
+                    element: document.querySelector(".block-detail-container"),
                     intro: 'Here you find the additional details about the selected block. We use <i>round</i> blockies for user IDs (again click on it to copy the ID) <img src="assets/user_Id_blockie.png"/>. The Forward and Back links are the arrows you cans see on the skipchain, and point to different blocks. By clicking on <i>"Block xxxx"</i> you\'ll be redirected to its details. ',
-                    position: 'left',
+                    position: "left",
                 },
                 {
-                    element: document.querySelector('.browse-container'),
-                    intro: 'In the transaction details, you can witness which instances have been used in the transactions and browse their past history with the search tool. Instances can be seen as contracts and can be <i>Spawned</i> (created), <i>Invoked</i> (modified), or <i>Deleted</i>, checking it\'s history shows you how the contract has evolved. Open the first transaction to continue!',
-                    position: 'top',
+                    element: document.querySelector(".browse-container"),
+                    intro: "In the transaction details, you can witness which instances have been used in the transactions and browse their past history with the search tool. Instances can be seen as contracts and can be <i>Spawned</i> (created), <i>Invoked</i> (modified), or <i>Deleted</i>, checking it's history shows you how the contract has evolved. Open the first transaction to continue!",
+                    position: "top",
                 },
                 {
-                    element: document.querySelector('.browse-container'),
-                    intro: 'Here you can browse for the previous/next/first instructions related to this Contract, to have an overwiev it\'s evolution. The result of the search is shown down on the page!',
-                    position: 'top',
+                    element: document.querySelector(".browse-container"),
+                    intro: "Here you can browse for the previous/next/first instructions related to this Contract, to have an overwiev it's evolution. The result of the search is shown down on the page!",
+                    position: "top",
                 },
                 {
-                    element: document.getElementById('status-info'),
-                    intro: 'By clicking on the Roster button, you can select a new roster by copy pasting the roster.toml infos and load a new Skipchain on the explorer!',
-                    position: 'top',
+                    element: document.getElementById("status-info"),
+                    intro: "By clicking on the Roster button, you can select a new roster by copy pasting the roster.toml infos and load a new Skipchain on the explorer!",
+                    position: "top",
                 },
                 {
-                    element: document.getElementById('step7'),
-                    intro: 'Congrats we are done ! Happy exploring :-)',
-                    position: 'top',
+                    element: document.getElementById("step7"),
+                    intro: "Congrats we are done ! Happy exploring :-)",
+                    position: "top",
                 },
             ],
         });

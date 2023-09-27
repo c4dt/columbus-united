@@ -4,9 +4,9 @@
     <img src="assets/logo-color-small.png">
 </div>
 
-You can run this webapp locally on your computer by following the
-instructions from the [ByzCoin](https://github.com/c4dt/byzcoin)
-project.
+This project is intended to be run together with the [ByzCoin](https://github.com/c4dt/byzcoin) blockchain.
+To test it locally, we recommend that you follow the instructions for setting up the ByzCoin project,
+and choose "Go to the OL Explorer" in the application menu.
 
 ## Description
 
