@@ -13,7 +13,7 @@ import { Utils } from "./utils";
  * @param roster the roster
  * @param flash the flash class that handles the flash messages
  * @param initialBlock the first block displayed at the load of the chain
- * @param hashBlock0 the hash of the genesis block
+ * @param genesisBlock the hash of the genesis block
  * @param blockClickedSubject the subject notified each time a block is clicked on
  * @param block Block instance
  * @author Sophia Artioli (sophia.artioli@epfl.ch)
@@ -24,7 +24,7 @@ export function searchBar(
     roster: Roster,
     flash: Flash,
     initialBlock: SkipBlock,
-    hashBlock0: string,
+    genesisBlock: string,
     blockClickedSubject: Subject<SkipBlock>,
     block: Block
 ) {
@@ -46,7 +46,7 @@ export function searchBar(
                 input,
                 roster,
                 flash,
-                hashBlock0,
+                genesisBlock,
                 initialBlock,
                 blockClickedSubject,
                 searchMode,
@@ -72,7 +72,7 @@ export function searchBar(
             input,
             roster,
             flash,
-            hashBlock0,
+            genesisBlock,
             initialBlock,
             blockClickedSubject,
             searchMode,
@@ -86,7 +86,7 @@ export function searchBar(
  * @param input the input inserted by the user
  * @param roster the roster defining the blockchain nodes
  * @param flash the flash class that handles the flash messages
- * @param hashBlock0 the hash of the genesis block
+ * @param genesisBlock the hash of the genesis block
  * @param initialBlock the first block displayed at the load of the chain
  * @param blockClickedSubject the subject notified each time a block is clicked on
  * @param searchMode the element requested (block hash, block index, instance id)
@@ -96,7 +96,7 @@ async function searchRequest(
     input: any,
     roster: Roster,
     flash: Flash,
-    hashBlock0: string,
+    genesisBlock: string,
     initialBlock: SkipBlock,
     blockClickedSubject: Subject<SkipBlock>,
     searchMode: string,
@@ -106,7 +106,7 @@ async function searchRequest(
         case "anything":
             if (input.length < 32) {
                 await indexSearch(
-                    hashBlock0,
+                    genesisBlock,
                     input,
                     roster,
                     flash,
@@ -145,7 +145,7 @@ async function searchRequest(
 
         case "index":
             await indexSearch(
-                hashBlock0,
+                genesisBlock,
                 input,
                 roster,
                 flash,
@@ -182,7 +182,7 @@ async function searchRequest(
 
     /**
      * Helper function to request for a searched block by index
-     * @param hashBlock0 the genesis block's hash
+     * @param genesisBlock the genesis block's hash
      * @param input user input
      * @param roster
      * @param flash
@@ -190,7 +190,7 @@ async function searchRequest(
      * @param blockClickedSubject the subject that is notified when a block is clicked
      */
     async function indexSearch(
-        hashBlock0: string,
+        genesisBlock: string,
         input: any,
         roster: Roster,
         flash: Flash,
@@ -199,7 +199,7 @@ async function searchRequest(
     ) {
         try {
             const block = await Utils.getBlockByIndex(
-                Utils.hex2Bytes(hashBlock0),
+                Utils.hex2Bytes(genesisBlock),
                 parseInt(input, 10),
                 roster
             );

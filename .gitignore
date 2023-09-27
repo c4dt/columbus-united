@@ -2,7 +2,7 @@
 node_modules/
 dist/
 jsdocs/
-src/roster.ts
+assets/config.toml
 .DS_Store
 
 

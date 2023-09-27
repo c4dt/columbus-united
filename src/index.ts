@@ -5,7 +5,6 @@ import { Block } from "./block";
 import { Chain } from "./chain";
 import { Flash } from "./flash";
 import { Lifecycle } from "./lifecycle";
-import { getRosterStr } from "./roster";
 import { searchBar } from "./search";
 import { Status } from "./status";
 import "./stylesheets/style.scss";
@@ -14,6 +13,7 @@ import { Utils } from "./utils";
 import * as d3 from "d3";
 import * as introJS from "intro.js";
 import { select, selectAll } from "d3";
+import { Config } from "./config";
 
 /*
    ___              _                     _
@@ -23,12 +23,6 @@ import { select, selectAll } from "d3";
 _|"""""|_|"""""|_|"""""|_|"""""|_|"""""|_|"""""|_|"""""|_|"""""|
 "`-0-0-'"`-0-0-'"`-0-0-'"`-0-0-'"`-0-0-'"`-0-0-'"`-0-0-'"`-0-0-'
  */
-
-// This is the genesis block, which is also the Skipchain identifier
-var hashBlock0 =
-    "9cc36071ccb902a1de7e0d21a2c176d73894b1cf88ae4cc2ba4c95cd76f474f3";
-// The roster configuration, parsed as a string
-const rosterStr = getRosterStr();
 
 /**
  *
@@ -46,19 +40,23 @@ const rosterStr = getRosterStr();
 export function sayHi() {
     initIntro();
 
-    //Roster selection
-    //1. default roster
-    startSkipchain(rosterStr, true);
+    Config.getConfig("assets/config.toml").then((config) => {
+        //Roster selection
+        //1. default roster
+        startSkipchain(config.roster, config.byzCoinID);
 
-    //2. selected roster by user
-    document
-        .getElementById("save-roster")
-        .addEventListener("click", function (e) {
-            const newRosterStr = (
-                document.getElementById("text-roster") as HTMLTextAreaElement
-            ).value;
-            startSkipchain(newRosterStr, false);
-        });
+        //2. selected roster by user
+        document
+            .getElementById("save-roster")
+            .addEventListener("click", function (e) {
+                const newRosterStr = (
+                    document.getElementById(
+                        "text-roster"
+                    ) as HTMLTextAreaElement
+                ).value;
+                startSkipchain(Roster.fromTOML(newRosterStr));
+            });
+    });
 }
 
 /**
@@ -67,10 +65,7 @@ export function sayHi() {
  * @param skipchainIndex
  *
  */
-export function startSkipchain(rosterStr: string, defaultSkipchain: boolean) {
-    // Create the roster
-    const roster = Roster.fromTOML(rosterStr);
-
+export function startSkipchain(roster: Roster, genesisBlock?: Buffer) {
     // Create the flash class that will handle the flash messages
     const flash = new Flash();
     if (!roster) {
@@ -91,13 +86,13 @@ export function startSkipchain(rosterStr: string, defaultSkipchain: boolean) {
     const scRPC = new SkipchainRPC(roster);
 
     //take the first skipchainID of the selected roster
-    if (!defaultSkipchain) {
+    if (genesisBlock === undefined) {
         scRPC
             .getAllSkipChainIDs()
             .then((resp) => {
                 //hashBlock 0 of new roster
 
-                hashBlock0 = Utils.bytes2String(resp[0]);
+                genesisBlock = resp[0];
             })
             .catch((e) =>
                 flash.display(
@@ -108,7 +103,7 @@ export function startSkipchain(rosterStr: string, defaultSkipchain: boolean) {
     }
 
     new SkipchainRPC(roster)
-        .getLatestBlock(Utils.hex2Bytes(hashBlock0), false, true)
+        .getLatestBlock(genesisBlock, false, true)
         .then((last) => {
             // skipBlock of the last added block of the chain
 
@@ -142,7 +137,7 @@ export function startSkipchain(rosterStr: string, defaultSkipchain: boolean) {
             } else {
                 // The user does not input a block index in the url
 
-                // Size of container that welcoms the blocks
+                // Size of container that contains the blocks
                 const containerSize = parseInt(
                     d3.select("#svg-container").style("width")
                 );
@@ -161,25 +156,20 @@ export function startSkipchain(rosterStr: string, defaultSkipchain: boolean) {
             }
         })
         .then(() => {
-            scRPC
-                .getSkipBlockByIndex(Utils.hex2Bytes(hashBlock0), 0)
-                .then((genesis) => {
-                    scRPC
-                        .getSkipBlockByIndex(
-                            Utils.hex2Bytes(hashBlock0),
-                            initialBlockIndex
-                        )
-                        .then((initialBlock) => {
-                            // Start the visualization
-                            startColumbus(
-                                genesis.skipblock,
-                                initialBlock.skipblock,
-                                roster,
-                                flash,
-                                defaultSkipchain
-                            );
-                        });
-                });
+            scRPC.getSkipBlockByIndex(genesisBlock, 0).then((genesis) => {
+                scRPC
+                    .getSkipBlockByIndex(genesisBlock, initialBlockIndex)
+                    .then((initialBlock) => {
+                        // Start the visualization
+                        startColumbus(
+                            genesis.skipblock,
+                            initialBlock.skipblock,
+                            roster,
+                            flash,
+                            genesisBlock !== undefined
+                        );
+                    });
+            });
         })
         .catch((e) =>
             flash.display(
@@ -236,7 +226,12 @@ export function startColumbus(
 
     // Create the browsing instance, which is used by the detailBlock class when a
     // user wants to get the lifecycle of an instance.
-    const lifecycle = new Lifecycle(roster, flash, totalBlock, hashBlock0);
+    const lifecycle = new Lifecycle(
+        roster,
+        flash,
+        totalBlock,
+        genesisBlock.hash.toString("hex")
+    );
 
     //Display status of nodes and statistics of the blockchain
     const skipchainStatus = new Status(roster, initialBlock, flash);
@@ -257,7 +252,7 @@ export function startColumbus(
         roster,
         flash,
         initialBlock,
-        hashBlock0,
+        genesisBlock.hash.toString("hex"),
         chain.blockClickedSubject,
         block
     );

@@ -1,8 +1,14 @@
-# columbus-united
+# columbus-united - ARCHIVED
 
 <div align="center">
     <img src="assets/logo-color-small.png">
 </div>
+
+This project is intended to be run together with the [ByzCoin](https://github.com/c4dt/byzcoin) blockchain.
+To test it locally, we recommend that you follow the instructions for setting up the ByzCoin project,
+and choose "Go to the OL Explorer" in the application menu.
+
+## Description
 
 <div align="center">
   <a href="https://github.com/c4dt/columbus-united/actions?query=workflow%3A%22Wookiee+deployment%22">
@@ -30,7 +36,7 @@ webpack, and using the d3 and rxjs librairies.
 
 👌 **Quick TL;DR setup**:
 
-1) Rename `src/roster.ts.template` to `src/roster.ts`
+1) Rename `assets/config.dedis.toml` to `assets/config.toml`
 2) Install dependencies with `npm install`
 3) Bundle the app with `npm run bundle`
 4) You are ready to go, open `index.html`
@@ -105,7 +111,7 @@ sudo apt-get install nodejs
 sudo apt-get install npm
 ```
 
-Rename `src/roster.ts.template` to `src/roster.ts`. By default it uses the DEDIS
+Rename `assets/config.dedis.toml` to `assets/config.toml`. By default it uses the DEDIS
 roster.
 
 Otherwise, follow instructions in the next section to run a local conode and get
@@ -140,7 +146,7 @@ You can stop it with <kbd>ctrl</kbd> + <kbd>C</kbd>.
 
 There are additional options that you can spot with `./byzcoin proxy -h`.
 
-You can then use the following roster in your `roster.ts`:
+You can then use the following roster in your `assets/config.toml`:
 
 ```
 [[servers]]
